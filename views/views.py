@@ -79,3 +79,23 @@ class MemberProfile(Resource):
         else:
             member = cursor.fetchone()
             return jsonify({"message":member})
+
+class AddDependant (Resource):
+    def post(self):
+        data = request.json
+        member_id = data["member_id"]
+        surname = data["surname"]
+        others = data["others"]
+        dob  = data["dob"]
+        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilab')
+        cursor = connection.cursor()
+        sql = "insert into dependants (member_id, surname, others, dob) values (%s, %s, %s, %s)"
+        data = (member_id, surname, others,dob)
+        try:
+            cursor.execute(sql, data)
+            connection.commit()
+            return jsonify({"Message":"POST SUCCESSFUL. Dependant saved"})
+
+        except:
+            connection.rollback
+            return jsonify({"Message":"POST FAILED. Dependant not saved"})
