@@ -65,3 +65,17 @@ class MemberSignin(Resource):
                 return jsonify({"Message": "Login failed"})
             else:
                 return jsonify({"Message": "Something went wrong"})
+            
+class MemberProfile(Resource):
+    def get(self):
+        data = request.json
+        member_id = data["member_id"]
+        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilab')
+        sql = "select * from member where member_id = %s"
+        cursor = connection.cursor(pymysql.cursors.DictCursor)
+        cursor.execute(sql, member_id)
+        if cursor.rowcount == 0:
+            return jsonify({"Message": "Member does not exist"})
+        else:
+            member = cursor.fetchone()
+            return jsonify({"message":member})
