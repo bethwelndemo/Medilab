@@ -67,7 +67,7 @@ class MemberSignin(Resource):
                 return jsonify({"Message": "Something went wrong"})
             
 class MemberProfile(Resource):
-    def get(self):
+    def post(self):
         data = request.json
         member_id = data["member_id"]
         connection = pymysql.connect(host='localhost', user='root', password='', database='Medilab')
