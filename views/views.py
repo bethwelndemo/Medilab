@@ -1,6 +1,9 @@
 import pymysql
 from flask_restful import Resource
 from flask import *
+# import JWT packages
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required
+
 
 from functions import *
 #  Add a member class
@@ -60,13 +63,15 @@ class MemberSignin(Resource):
             hashed_password = member["password"]
             is_match_password = hash_verify(password, hashed_password)
             if is_match_password == True:
-                return jsonify({"Message": "Login successful"})
+                access_token = create_access_token(identity=member, fresh=True)
+                return jsonify({"access_token":access_token,'member':member})
             elif is_match_password == False:
                 return jsonify({"Message": "Login failed"})
             else:
                 return jsonify({"Message": "Something went wrong"})
             
 class MemberProfile(Resource):
+    @jwt_required(fresh=True)
     def post(self):
         data = request.json
         member_id = data["member_id"]
@@ -81,6 +86,7 @@ class MemberProfile(Resource):
             return jsonify({"message":member})
 
 class AddDependant (Resource):
+    @jwt_required(fresh=True)
     def post(self):
         data = request.json
         member_id = data["member_id"]
@@ -101,6 +107,7 @@ class AddDependant (Resource):
             return jsonify({"Message":"POST FAILED. Dependant not saved"})
 
 class ViewDependants(Resource):
+    @jwt_required(fresh=True)
     def post(self):
         data = request.json
         member_id = data["member_id"]
@@ -113,5 +120,32 @@ class ViewDependants(Resource):
         else:
             member = cursor.fetchall()
             return jsonify({"message":member})
+
+class Laboratories(Resource):
+    def get(self):
+        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilab')
+        sql = "select * from laboratories"
+        cursor = connection.cursor(pymysql.cursors.DictCursor)
+        cursor.execute(sql)
+        if cursor.rowcount == 0:
+            return jsonify({"Message":"No laboratories"})
+        else:
+            labs = cursor.fetchall()
+            return jsonify(labs)
+
+class LabTest(Resource):
+    def post(self):
+        data = request.json
+        lab_id = data["lab_id"]
+        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilab')
+        sql = "select * from lab_tests where lab_id = %s"
+        cursor = connection.cursor(pymysql.cursors.DictCursor)
+        cursor.execute(sql, lab_id)
+        if cursor.rowcount == 0:
+            return jsonify({"Message": "No lab test found"})
+        else:
+            lab = cursor.fetchall()
+            return jsonify({"message":lab})
+
 
     
