@@ -147,5 +147,60 @@ class LabTest(Resource):
             lab = cursor.fetchall()
             return jsonify({"message":lab})
 
+class MakeBooking(Resource):
+    def post(self):
+        data = request.json
+        member_id = data["member_id"]
+        booked_for = data["booked_for"]
+        dependant_id = data["dependant_id"]
+        test_id = data["test_id"]
+        appointment_date = data["appointment_date"]
+        appointment_time = data["appointment_time"]
+        where_taken = data["where_taken"]
+        latitude = data["latitude"]
+        longitude = data["longitude"]
+        status = data["status"]
+        lab_id = data["lab_id"]
+        invoice_no = data["invoice_no"]
+        
+        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilab')
+        cursor = connection.cursor()
+        sql = "insert into bookings(member_id, booked_for, dependant_id, test_id, appointment_date, appointment_time, where_taken, latitude, longitude, status, lab_id, invoice_no) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        data = (member_id, booked_for, dependant_id, test_id, appointment_date, appointment_time, where_taken, latitude, longitude, status, lab_id, invoice_no)
 
-    
+        try:
+            cursor.execute(sql, data)
+            connection.commit()
+            return jsonify({"message":"Booking Verified"})
+        
+        except:
+            connection.rollback()
+            return jsonify({"message":"Booking Failed"})
+
+class mybooking(Resource):
+    def get(self):
+        data = request.json
+        member_id = data["member_id"]
+        connection = pymysql.connect(host='localhost', user='root', password='', database='Medilab')
+        sql = "select * from bookings where member_id = %s"
+        cursor = connection.cursor(pymysql.cursors.DictCursor)
+        cursor.execute(sql, member_id)
+        if cursor.rowcount == 0:
+            return jsonify({"Message": "Booking does not exist"})
+        else:
+            bookings = cursor.fetchall()
+            # date and time was not convertible to json
+            # hence we use json.dumps and json.loads
+            import json
+            # we want to pass our bookings to json.dumps
+            ourbookings = json.dumps(bookings, indent=1, sort_keys=True, default=str)
+            return json.loads(ourbookings)
+
+class payment(Resource):
+    def post(self):
+        data = request.json
+        invoice_no = data["invoice_no"]
+        amount = data["amount"]
+        phone = data["phone"]
+        mpesa_payment(amount, phone, invoice_no)
+        return jsonify({"message":"Payment Successful"})
