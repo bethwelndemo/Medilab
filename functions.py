@@ -1,6 +1,6 @@
 # generate random number
 # function definition,takes no argument
-def gen_ramdom():
+def gen_random():
     import random
     # random is used to generate random numbers and make random selection
     import string
@@ -34,7 +34,7 @@ def check_phone(phone):
     
 # check_phone ("+254114373702")
     
-# check password validity+
+# check password validity+assword is not valid
 import re
 def password_validity(password):
     if len(password) < 8:
@@ -128,7 +128,7 @@ def encypt(data):
     # print(fernet)
     # this creates a fernet object for encryption
     encypt_data = fernet.encrypt(data.encode())
-    print (encypt_data.decode())
+    return (encypt_data.decode())
 # encypt("1234") 
 
 
@@ -137,7 +137,7 @@ def decrypt(encrypted_data):
     key = load_key()
     fernet = Fernet(key)
     decrypted_data = fernet.decrypt(encrypted_data.encode())
-    print(decrypted_data.decode())
+    return(decrypted_data.decode())
 
 # decrypt("gAAAAABmUELDvvXXgXB97jGaB26jhrWLAFf7nj_Fnq39BCfaXVYbFZr5SsG9_KwrORzW8g6XIueYiuZ5H2OOCwNwgPvFScDE7w==")
 import  requests

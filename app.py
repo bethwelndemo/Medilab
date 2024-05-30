@@ -25,6 +25,9 @@ api.add_resource(LabTest,'/api/lab_test')
 api.add_resource(MakeBooking,'/api/makebooking')
 api.add_resource(mybooking,'/api/mybooking')
 api.add_resource(payment,'/api/payment')
+
+from views.views_dashboard import LabSignup
+api.add_resource(LabSignup,'/api/labsignup')
 if __name__  == "__main__":
  
     app.run(debug=True)
